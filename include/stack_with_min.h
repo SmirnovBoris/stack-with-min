@@ -6,7 +6,7 @@
 
 namespace stack_ns {
 
-template <typename T>
+template <typename T, typename Less = std::less<T>>
 class StackWithMin {
 private:
     struct Node {
@@ -20,6 +20,14 @@ private:
 
         T value;
         const T* min = nullptr;
+
+        void set_min(const T* prev) {
+            if (prev == nullptr || Less{}(value, *prev)) {
+                min = &value;
+            } else {
+                min = prev;
+            }
+        }
     };
     std::stack<Node> stack;
 public:
@@ -29,7 +37,7 @@ public:
     template <class U>
     requires std::is_convertible_v<U, T>
     void push(U&& value) {  
-        auto* last_top = empty() ? nullptr : stack.top().min;
+        const T* prev_min = stack.empty() ? nullptr : stack.top().min;
         // Prefer move semantics if possible
         if constexpr (std::is_nothrow_move_constructible_v<T> && !std::is_copy_constructible_v<T>) {
             stack.push(std::move(value));
@@ -38,23 +46,15 @@ public:
         if constexpr (!(std::is_nothrow_move_constructible_v<T> && !std::is_copy_constructible_v<T>)) {
             stack.push(value);
         }
-        if (last_top == nullptr) {
-            stack.top().min = &stack.top().value;
-        } else {
-            stack.top().min = (stack.top().value < *last_top) ? &stack.top().value : last_top;
-        }
+        stack.top().set_min(prev_min);
     }
 
     template <class... U>
     requires std::is_constructible_v<T, U...>
     void emplace(U&&... value) {
-        auto* last_top = empty() ? nullptr : stack.top().min;
+        const T* prev_min = stack.empty() ? nullptr : stack.top().min;
         stack.emplace(std::forward<U>(value)...);
-        if (last_top == nullptr) {
-            stack.top().min = &stack.top().value;
-        } else {
-            stack.top().min = (stack.top().value < *last_top) ? &stack.top().value : last_top;
-        }
+        stack.top().set_min(prev_min);
     }
 
     void pop() {
