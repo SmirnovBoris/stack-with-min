@@ -109,6 +109,18 @@ TYPED_TEST(StackTest, GetMin) {
     EXPECT_EQ(TestFixture::stack.get_min(), 2);
 }
 
+TYPED_TEST(StackTest, NoexceptTest) {
+    TestFixture::stack.push(1);
+    TestFixture::stack.push(2);
+    TestFixture::stack.push(3);
+    EXPECT_EQ(TestFixture::stack.try_pop(), stack_ns::StackWithMin<TypeParam>::pop_result::success);
+    EXPECT_EQ(TestFixture::stack.try_pop(), stack_ns::StackWithMin<TypeParam>::pop_result::success);
+    EXPECT_EQ(TestFixture::stack.try_pop(), stack_ns::StackWithMin<TypeParam>::pop_result::success);
+    EXPECT_EQ(TestFixture::stack.try_pop(), stack_ns::StackWithMin<TypeParam>::pop_result::empty_stack);
+    EXPECT_EQ(TestFixture::stack.try_top().has_value(), false);
+    EXPECT_EQ(TestFixture::stack.try_get_min().has_value(), false);
+}
+
 class WithExplicitConstructor {
 public:
     explicit WithExplicitConstructor(int first_value, int second_value) : value{first_value + second_value} {}

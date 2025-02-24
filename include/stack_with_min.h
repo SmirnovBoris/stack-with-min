@@ -49,12 +49,24 @@ public:
         }
     }
 
-
     void pop() {
         if (empty()) {
             throw std::runtime_error("empty stack");
         }
         stack.pop();
+    }
+
+    enum class pop_result {
+        success,
+        empty_stack,
+    };
+
+    pop_result try_pop() noexcept {
+        if (empty()) {
+            return pop_result::empty_stack;
+        }
+        stack.pop();
+        return pop_result::success;
     }
 
     const T& top() const {
@@ -64,9 +76,23 @@ public:
         return stack.top().value;
     }
 
+    std::optional<std::reference_wrapper<const T>> try_top() const noexcept {
+        if (empty()) {
+            return std::nullopt;
+        }
+        return stack.top().value;
+    }
+
     const T& get_min() const {
         if (empty()) {
             throw std::runtime_error("empty stack");
+        }
+        return *stack.top().min;
+    }
+
+    std::optional<std::reference_wrapper<const T>> try_get_min() const noexcept {
+        if (empty()) {
+            return std::nullopt;
         }
         return *stack.top().min;
     }
