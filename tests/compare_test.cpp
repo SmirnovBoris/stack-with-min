@@ -1,4 +1,7 @@
 #include <gtest/gtest.h>
+
+#include <optional>
+
 #include "stack_with_min.h"  // Include your stack header file
 
 
