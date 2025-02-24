@@ -121,6 +121,8 @@ TYPED_TEST(StackTest, NoexceptTest) {
     EXPECT_EQ(TestFixture::stack.try_get_min().has_value(), false);
 }
 
+
+
 class WithExplicitConstructor {
 public:
     explicit WithExplicitConstructor(int first_value, int second_value) : value{first_value + second_value} {}
@@ -164,5 +166,44 @@ TEST_F(ExplicitTest, Emplace) {
         stack.pop();
     } catch (const std::runtime_error &err) {
         EXPECT_STREQ(err.what(), "empty stack");
+    }
+}
+
+class ThrowableMove {
+public:
+    ThrowableMove(int value) : value{value} {}
+    ThrowableMove(ThrowableMove&& other) : value{other.value} {
+        if (value == -3) {
+            throw std::runtime_error("-3");
+        }
+    }
+    ThrowableMove(const ThrowableMove&) = default;
+    int value;
+    bool operator<(const ThrowableMove& other) const {
+        return value < other.value;
+    }
+};
+
+class ThrowableMoveTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // Code here will be called immediately after the constructor (right before each test).
+    }
+
+    void TearDown() override {
+        // Code here will be called immediately after each test (right before the destructor).
+    }
+
+    stack_ns::StackWithMin<ThrowableMove> stack; 
+};
+
+TEST_F(ThrowableMoveTest, test) {
+    stack.push(1);
+    stack.push(2);
+    stack.push(3);
+    try {
+        stack.push(-3);
+    } catch (const std::runtime_error &err) {
+        EXPECT_STREQ(err.what(), "-3");
     }
 }

@@ -30,7 +30,14 @@ public:
     requires std::is_convertible_v<U, T>
     void push(U&& value) {  
         auto* last_top = empty() ? nullptr : stack.top().min;
-        stack.push(std::forward<U>(value));
+        // Prefer move semantics if possible
+        if constexpr (std::is_nothrow_move_constructible_v<T> && !std::is_copy_constructible_v<T>) {
+            stack.push(std::move(value));
+        } 
+        // Prefer copy semantics for exception safety
+        if constexpr (!(std::is_nothrow_move_constructible_v<T> && !std::is_copy_constructible_v<T>)) {
+            stack.push(value);
+        }
         if (last_top == nullptr) {
             stack.top().min = &stack.top().value;
         } else {
