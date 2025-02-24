@@ -6,7 +6,7 @@
 
 namespace stack_ns {
 
-template <typename T, typename Less = std::less<T>>
+template <typename T, typename Less = std::less<T>, typename Container = std::stack<T>>
 class StackWithMin {
 private:
     struct Node {
