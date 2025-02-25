@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "stack_with_min.h"  // Include your stack header file
+#include "stack_with_min.h"
 
 
 enum class simple_stack_ret {
@@ -25,7 +25,7 @@ public:
     }
     std::optional<int> top() const {
         if (stack.empty()) {
-            std::nullopt;
+            return std::nullopt;
         }
         return stack.back();
     }
@@ -61,7 +61,7 @@ protected:
         // Code here will be called immediately after each test (right before the destructor).
     }
 
-    stack_ns::StackWithMin<int> stack;  
+    stack_ns::StackWithMin<int> stack;
     simple_stack_with_min simple_stack;
 
     void push(int value) {

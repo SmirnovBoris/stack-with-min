@@ -207,3 +207,63 @@ TEST_F(ThrowableMoveTest, test) {
         EXPECT_STREQ(err.what(), "-3");
     }
 }
+
+class TestOnVector : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // Code here will be called immediately after the constructor (right before each test).
+    }
+
+    void TearDown() override {
+        // Code here will be called immediately after each test (right before the destructor).
+    }
+
+    template <typename T>
+    class StackOnVector {
+    public:
+        void push(T value) {
+            stack.push_back(value);
+        }
+
+        void pop() {
+            stack.pop_back();
+        }
+
+        const T& top() const {
+            return stack.back();
+        }
+
+        T& top() {
+            return stack.back();
+        }
+
+        bool empty() const {
+            return stack.empty();
+        }
+
+        size_t size() const {
+            return stack.size();
+        }
+
+        std::vector<T> stack;
+    };
+
+    stack_ns::StackWithMin<int, std::less<int>, StackOnVector> stack; 
+};
+
+TEST_F(TestOnVector, test) {
+    stack.push(1);
+    stack.push(2);
+    stack.push(3);
+    EXPECT_EQ(stack.size(), 3);
+    EXPECT_EQ(stack.top(), 3);
+    stack.pop();
+    EXPECT_EQ(stack.size(), 2);
+    EXPECT_EQ(stack.top(), 2);
+    stack.pop();
+    EXPECT_EQ(stack.size(), 1);
+    EXPECT_EQ(stack.top(), 1);
+    stack.pop();
+    EXPECT_EQ(stack.size(), 0);
+    EXPECT_EQ(stack.empty(), true);
+}

@@ -69,10 +69,10 @@ static_assert(sizeof(Node<char, std::less<char>>) == sizeof(char) * 2);
 } // namespace detail
 
 
-template <typename T, typename Less = std::less<T>, typename Container = std::stack<T>>
+template <typename T, typename Less = std::less<T>, template<class> class Container = std::stack>
 class StackWithMin {
 private:
-    std::stack<detail::Node<T, Less>> stack;
+    Container<detail::Node<T, Less>> stack;
 public:
     using node_t = detail::Node<T, Less>*;
     StackWithMin() = default;
